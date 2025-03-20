@@ -2,25 +2,47 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import logo from "@/assets/images/logo.png";
 import profileDefault from "@/assets/images/profile.png";
 import { FaGoogle } from "react-icons/fa";
 import { usePathname } from "next/navigation";
+import { signIn, signOut, useSession, getProviders } from "next-auth/react";
 
 const Navbar = () => {
+  const { data: session } = useSession();
+  const profileImage = session?.user?.image;
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [providers, setProviders] = useState(null);
 
-  const pathname = usePathname()
+  
+  const pathname = usePathname();
+  
+
+  useEffect(() => {
+    const setAuthProviders = async () => {
+      const res = await getProviders();
+      console.log(res);
+      
+      setProviders(res);
+    };
+
+    setAuthProviders();
+
+    // Note: close mobile menu if the viewport size is changed
+    window.addEventListener("resize", () => {
+      setIsProfileMenuOpen(false);
+    });
+  }, []);
 
   function handleMenuOpen() {
-    setIsMobileMenuOpen(!isMobileMenuOpen)
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   }
 
   function handleProfileMenuOpen() {
-    setIsProfileMenuOpen(!isProfileMenuOpen)
+    setIsProfileMenuOpen(!isProfileMenuOpen);
   }
 
   return (
@@ -56,7 +78,11 @@ const Navbar = () => {
           <div className="flex items-center md:items-stretch md:justify-start">
             {/* Logo */}
             <Link href="/" className="flex flex-shrink-0 items-center gap-2">
-              <Image src={logo} alt="logo" className="hidden md:block h-10 w-auto" />
+              <Image
+                src={logo}
+                alt="logo"
+                className="hidden md:block h-10 w-auto"
+              />
               <span className="hidden md:block text-white text-2xl font-bold italic">
                 Kayrent
               </span>
@@ -67,40 +93,61 @@ const Navbar = () => {
               <div className="flex space-x-2">
                 <Link
                   href="/"
-                  className={`${pathname === "/" ? "underline underline-offset-4 bg-gray-900/50" : "" } text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2`}
+                  className={`${
+                    pathname === "/"
+                      ? "underline underline-offset-4 bg-gray-900/50"
+                      : ""
+                  } text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2`}
                 >
                   Home
                 </Link>
                 <Link
                   href="/properties"
-                  className={`${pathname === "/properties" ? "underline underline-offset-4 bg-gray-900/50" : "" } text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2`}
+                  className={`${
+                    pathname === "/properties"
+                      ? "underline underline-offset-4 bg-gray-900/50"
+                      : ""
+                  } text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2`}
                 >
                   Properties
                 </Link>
-                <Link
-                  href="/properties/add"
-                  className={`${pathname === "/properties/add" ? "underline underline-offset-4 bg-gray-900/50" : "" } text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2`}
-                >
-                  Add Property
-                </Link>
+                {session && (
+                  <Link
+                    href="/properties/add"
+                    className={`${
+                      pathname === "/properties/add"
+                        ? "underline underline-offset-4 bg-gray-900/50"
+                        : ""
+                    } text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2`}
+                  >
+                    Add Property
+                  </Link>
+                )}
               </div>
             </div>
           </div>
 
           {/* Right Side Menu (Logged Out) */}
-          {!isLoggedIn && (
+          {!session && (
             <div className="hidden md:block md:ml-6">
               <div className="flex items-center">
-                <button className="flex items-center text-white bg-gray-700 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2 my-3">
-                  <FaGoogle className="text-white mr-2" />
-                  <span>Login or Register</span>
-                </button>
+                {providers &&
+                  Object.values(providers).map((provider) => (
+                    <button
+                      className="flex items-center text-white bg-gray-700 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2 my-3"
+                      onClick={() => signIn(provider.id)}
+                      key={provider.name}
+                    >
+                      <FaGoogle className="text-white mr-2" />
+                      <span>Login or Register</span>
+                    </button>
+                  ))}
               </div>
             </div>
           )}
 
           {/* Right side menu (Logged In)  */}
-          {isLoggedIn && (
+          {session && (
             <div className="flex items-center pr-2">
               <Link href="/messages">
                 <button className="relative rounded-full bg-gray-800 p-1 mr-3 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
@@ -134,7 +181,7 @@ const Navbar = () => {
                     <span className="absolute -inset-1.5"></span>
                     <span className="sr-only">Open user menu</span>
                     <Image
-                      src={profileDefault}
+                      src={profileImage || profileDefault}
                       alt="profile Image"
                       width={40}
                       height={40}
@@ -145,20 +192,32 @@ const Navbar = () => {
 
                 {/* Profile dropdown */}
                 {isProfileMenuOpen && (
-                    <div className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <div className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <Link
                       href="/profile"
+                      onClick={() => {
+                        setIsProfileMenuOpen(false);
+                      }}
                       className="block px-4 py-2 text-sm text-gray-700"
                     >
                       Your profile
                     </Link>
                     <Link
                       href="/properties/saved"
+                      onClick={() => {
+                        setIsProfileMenuOpen(false);
+                      }}
                       className="block px-4 py-2 text-sm text-gray-700"
                     >
                       Save Properties
                     </Link>
-                    <button className="block px-4 py-2 text-sm text-gray-700">
+                    <button
+                      onClick={() => {
+                        setIsProfileMenuOpen(false);
+                        signOut({ callbackUrl: "/" });
+                      }}
+                      className="block px-4 py-2 text-sm text-gray-700"
+                    >
                       Sign Out
                     </button>
                   </div>
@@ -182,32 +241,55 @@ const Navbar = () => {
             </Link>
             <Link
               href="/"
-              className={`${pathname === "/" ? "underline underline-offset-4 bg-gray-900/50" : ""} text-white block rounded-md px-3 py-2 text-base font-medium hover:bg-gray-900`}
+              className={`${
+                pathname === "/"
+                  ? "underline underline-offset-4 bg-gray-900/50"
+                  : ""
+              } text-white block rounded-md px-3 py-2 text-base font-medium hover:bg-gray-900`}
             >
               Home
             </Link>
             <Link
               href="/properties"
-              className={`${pathname === "/properties" ? "underline underline-offset-4 bg-gray-900/50" : ""} text-white block rounded-md px-3 py-2 text-base font-medium hover:bg-gray-900`}
+              className={`${
+                pathname === "/properties"
+                  ? "underline underline-offset-4 bg-gray-900/50"
+                  : ""
+              } text-white block rounded-md px-3 py-2 text-base font-medium hover:bg-gray-900`}
             >
               Properties
             </Link>
 
-            <Link
-              href="/properties/add"
-              className={`${pathname === "/properties/add" ? "underline underline-offset-4 bg-gray-900/50" : ""} text-white block rounded-md px-3 py-2 text-base font-medium hover:bg-gray-900`}
-            >
-              Add Property
-            </Link>
+            {session && (
+              <Link
+                href="/properties/add"
+                className={`${
+                  pathname === "/properties/add"
+                    ? "underline underline-offset-4 bg-gray-900/50"
+                    : ""
+                } text-white block rounded-md px-3 py-2 text-base font-medium hover:bg-gray-900`}
+              >
+                Add Property
+              </Link>
+            )}
 
-            <div className="block md:ml-6">
-              <div className="flex items-center">
-                <button className="flex items-center text-white bg-gray-700 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2 my-3">
-                  <FaGoogle className="text-white mr-2" />
-                  <span>Login or Register</span>
-                </button>
+            {!session && (
+              <div className="block md:ml-6">
+                <div className="flex items-center">
+                  {providers &&
+                    Object.values(providers).map((provider) => (
+                      <button
+                        key={provider.name}
+                        onClick={() => signIn(provider.id)}
+                        className="flex items-center text-white bg-gray-700 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2 my-3"
+                      >
+                        <FaGoogle className="text-white mr-2" />
+                        <span>Login or Register</span>
+                      </button>
+                    ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       )}
