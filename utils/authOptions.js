@@ -3,6 +3,8 @@ import User from "@/models/user.model";
 
 import GoogleProvider from "next-auth/providers/google";
 
+console.log("GoogleProvider:", GoogleProvider);
+
 export const authOptions = {
   session: {
     strategy: "jwt",
@@ -44,7 +46,7 @@ export const authOptions = {
 
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
+        token.id = user._id;
         token.email = user.email;
       }
       return token;
@@ -54,11 +56,12 @@ export const authOptions = {
     async session({ session, token }) {
       if (token) {
         // 1. Get user from database
-        // const user = await User.findOne({ email: token.email });
+        const user = await User.findOne({ email: token.email });
         // 2. Assign the user id to the session
-        session.user= {
-            email: token.email,
-            image: token.picture
+        session.user = {
+          email: token.email,
+          image: token.picture,
+          id: user._id.toString()
         };
       }
 
@@ -66,7 +69,7 @@ export const authOptions = {
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
 // if (token) {
