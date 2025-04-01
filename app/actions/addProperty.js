@@ -26,10 +26,10 @@ async function addProperty(formData) {
     name: formData.get("name"),
     description: formData.get("desc"),
     location: {
-      street: formData.get("location-street"),
-      city: formData.get("location-city"),
-      state: formData.get("location-state"),
-      zipcode: formData.get("location-zipcode"),
+      street: formData.get("location.street"),
+      city: formData.get("location.city"),
+      state: formData.get("location.state"),
+      zipcode: formData.get("location.zipcode"),
     },
     beds: formData.get("beds"),
     baths: formData.get("baths"),
@@ -38,7 +38,7 @@ async function addProperty(formData) {
     rates: {
       weekly: formData.get("rates.weekly"),
       monthly: formData.get("rates.monthly"),
-      nightly: formData.get("rates.nightly."),
+      nightly: formData.get("rates.nightly"),
     },
     seller_info: {
       name: formData.get("seller_info.name"),
