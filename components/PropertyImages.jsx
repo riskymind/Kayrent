@@ -9,8 +9,8 @@ const PropertyImages = ({ images }) => {
             src={images[0]}
             alt=""
             className="object-cover h-[400px] mx-auto rounded-xl"
-            width={1800}
-            height={400}
+            width={800}
+            height={600}
             priority={true}
           />
         ) : (
@@ -28,8 +28,8 @@ const PropertyImages = ({ images }) => {
                   src={image}
                   alt=""
                   className="object-cover h-[400px] w-full rounded-xl"
-                  width={1800}
-                  height={400}
+                  width={800}
+                  height={600}
                   priority={true}
                 />
               </div>

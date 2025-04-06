@@ -26,7 +26,7 @@ const MessageCard = ({ message }) => {
   };
 
   if (isDeleted) {
-    return <p>Deleted message</p>;
+    return <p className='text-red-500'>Deleted message</p>;
   }
 
   return (
@@ -36,26 +36,26 @@ const MessageCard = ({ message }) => {
           New
         </div>
       )}
-      <h2 className='text-xl mb-4'>
+      <h2 className='text-xl mb-4 text-gray-700'>
         <span className='font-bold'>Property Inquiry:</span>{' '}
         {message.property.name}
       </h2>
       <p className='text-gray-700'>{message.body}</p>
 
       <ul className='mt-4'>
-        <li>
+        <li className='text-gray-700'>
           <strong>Reply Email:</strong>{' '}
           <a href={`mailto:${message.email}`} className='text-blue-500'>
             {message.email}
           </a>
         </li>
-        <li>
+        <li className='text-gray-700'>
           <strong>Reply Phone:</strong>{' '}
           <a href={`tel:${message.phone}`} className='text-blue-500'>
             {message.phone}
           </a>
         </li>
-        <li>
+        <li className='text-gray-700'>
           <strong>Received:</strong>{' '}
           {new Date(message.createdAt).toLocaleString()}
         </li>
