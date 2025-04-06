@@ -1,13 +1,20 @@
+import BookmarkButton from "@/components/BookmarkButton";
+import PropertyContactForm from "@/components/PropertyContactForm";
 import PropertyDetails from "@/components/PropertyDetails";
 import PropertyHeaderImage from "@/components/PropertyHeaderImage";
+import PropertyImages from "@/components/PropertyImages";
+import ShareButtons from "@/components/ShareButtons";
 import connectDB from "@/config/database";
 import Property from "@/models/property.model";
+import { convertToSerializeableObject } from "@/utils/convertToObject";
 import Link from "next/link";
 import { FaArrowLeft } from "react-icons/fa";
 
 const PropertyPage = async ({ params }) => {
   await connectDB()
-  const property = await Property.findById(params.id).lean()
+  const propertyDoc = await Property.findById(params.id).lean()
+  const property = convertToSerializeableObject(propertyDoc)
+  
   
 
   if (!property) {
@@ -30,11 +37,20 @@ const PropertyPage = async ({ params }) => {
       </section>
       <section className="bg-blue-50">
         <div className="container m-auto py-10 px-6">
-          <div className="grid grid-cols-1 md:grid-cols-70/30 w-full gap-6">
-            <PropertyDetails property={property}/>
+          <div className="flex justify-between flex-wrap w-full gap-6">
+            <div className="flex-2">
+              <PropertyDetails property={property}/>
+            </div>
+            {/* Sidebar */}
+            <aside className="space-y-4 flex-1">
+              <BookmarkButton property={property}/>
+              <ShareButtons property={property}/>
+              <PropertyContactForm property={property}/>
+            </aside>
           </div>
         </div>
       </section>
+      <PropertyImages images={property.images}/>
     </>
   );
 };

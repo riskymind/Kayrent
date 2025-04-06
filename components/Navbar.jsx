@@ -8,6 +8,7 @@ import profileDefault from "@/assets/images/profile.png";
 import { FaGoogle } from "react-icons/fa";
 import { usePathname } from "next/navigation";
 import { signIn, signOut, useSession, getProviders } from "next-auth/react";
+import UnreadMessageCount from "./UnreadMessageCount";
 
 const Navbar = () => {
   const { data: session } = useSession();
@@ -149,7 +150,7 @@ const Navbar = () => {
           {/* Right side menu (Logged In)  */}
           {session && (
             <div className="flex items-center pr-2">
-              <Link href="/messages">
+              <Link href="/messages" className="relative group">
                 <button className="relative rounded-full bg-gray-800 p-1 mr-3 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                   <span className="absolute -inset-1.5"></span>
                   <span className="sr-only">View notifications</span>
@@ -168,6 +169,7 @@ const Navbar = () => {
                     />
                   </svg>
                 </button>
+                <UnreadMessageCount />
               </Link>
 
               {/* Profile dropdown button */}

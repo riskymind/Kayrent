@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "../components/Navbar";
 import Footer from "@/components/Footer";
 import AuthProvider from "@/components/AuthProvider";
+import { GlobalProvider } from "@/context/GlobalContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,15 +23,17 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <AuthProvider>
-      <html lang="en">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
-        </body>
-      </html>
+      <GlobalProvider>
+        <html lang="en">
+          <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          >
+            <Navbar />
+            <main>{children}</main>
+            <Footer />
+          </body>
+        </html>
+      </GlobalProvider>
     </AuthProvider>
   );
 }
