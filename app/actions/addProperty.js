@@ -5,6 +5,33 @@ import { getSessionUser } from "@/utils/getSessionUser";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import cloudinary from "@/config/cloudinary";
+import streamifier from "streamifier";
+import { Readable } from "stream";
+
+function bufferToStream(buffer) {
+  return new Readable({
+    read() {
+      this.push(buffer);
+      this.push(null);
+    },
+  });
+}
+
+async function uploadImageToCloudinary(imageFile) {
+  const buffer = Buffer.from(await imageFile.arrayBuffer());
+
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: "kayrent_images" },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result.secure_url);
+      }
+    );
+
+    bufferToStream(buffer).pipe(stream);
+  });
+}
 
 async function addProperty(formData) {
   await connectDB();
@@ -48,25 +75,7 @@ async function addProperty(formData) {
     owner: userId,
   };
 
-  const imageUrls = [];
-
-  for (const imageFile of images) {
-    const imageBuffer = await imageFile.arrayBuffer();
-    const imageArray = Array.from(new Uint8Array(imageBuffer));
-    const imageData = Buffer.from(imageArray);
-
-    // Convert the image data to base64
-    const imageBase64 = imageData.toString("base64");
-
-    // Make request to upload to clodinary
-    const result = await cloudinary.uploader.upload(
-      `data:image/png;base64,${imageBase64}`,
-      {
-        folder: "kayrent_images",
-      }
-    );
-    imageUrls.push(result.secure_url);
-  }
+  const imageUrls = await Promise.all(images.map(uploadImageToCloudinary));
 
   propertyData.images = imageUrls;
 
@@ -77,4 +86,4 @@ async function addProperty(formData) {
   redirect(`/properties/${newProperty._id}`);
 }
 
-export default addProperty
+export default addProperty;

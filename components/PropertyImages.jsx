@@ -23,12 +23,11 @@ const PropertyImages = ({ images }) => {
                   className="object-cover h-[400px] mx-auto rounded-xl cursor-pointer"
                   width={800}
                   height={600}
-                  priority={true}
                 />
               )}
             </Item>
           ) : (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {images.map((image, index) => (
                 <div
                   key={index}
@@ -53,7 +52,6 @@ const PropertyImages = ({ images }) => {
                         className="object-cover h-[400px] w-full rounded-xl cursor-pointer"
                         width={800}
                         height={600}
-                        priority={true}
                       />
                     )}
                   </Item>
