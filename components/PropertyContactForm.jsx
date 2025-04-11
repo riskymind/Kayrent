@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useActionState } from 'react';
+import { useEffect, useActionState, useState } from 'react';
 import { useFormState } from 'react-dom';
 import { useSession } from 'next-auth/react';
 import { toast } from 'react-toastify';
@@ -10,11 +10,20 @@ const PropertyContactForm = ({ property }) => {
   const { data: session } = useSession();
 
   const [state, formAction] = useActionState(addMessage, {});
+  const [focused, setFocused] = useState(false);
 
   useEffect(() => {
     if (state.error) toast.error(state.error);
     if (state.submitted) toast.success('Message sent successfully');
   }, [state]);
+
+  const handleFocus = () => {
+    setFocused(true);
+  };
+
+  const handleBlur = () => {
+    setFocused(false);
+  };
 
   if (state.submitted) {
     return (
@@ -55,6 +64,8 @@ const PropertyContactForm = ({ property }) => {
               type='text'
               placeholder='Enter your name'
               required
+              onFocus={handleFocus}
+              onBlur={handleBlur}
             />
           </div>
           <div className='mb-4'>
@@ -71,6 +82,8 @@ const PropertyContactForm = ({ property }) => {
               type='email'
               placeholder='Enter your email'
               required
+              onFocus={handleFocus}
+              onBlur={handleBlur}
             />
           </div>
           <div className='mb-4'>
@@ -86,6 +99,8 @@ const PropertyContactForm = ({ property }) => {
               name='phone'
               type='text'
               placeholder='Enter your phone number'
+              onFocus={handleFocus}
+              onBlur={handleBlur}
             />
           </div>
           <div className='mb-4'>
@@ -100,6 +115,8 @@ const PropertyContactForm = ({ property }) => {
               id='message'
               name='message'
               placeholder='Enter your message'
+              onFocus={handleFocus}
+              onBlur={handleBlur}
             ></textarea>
           </div>
           <div>
