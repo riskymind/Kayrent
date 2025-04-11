@@ -5,7 +5,6 @@ import { getSessionUser } from "@/utils/getSessionUser";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import cloudinary from "@/config/cloudinary";
-import streamifier from "streamifier";
 import { Readable } from "stream";
 
 function bufferToStream(buffer) {

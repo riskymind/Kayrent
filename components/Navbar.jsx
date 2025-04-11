@@ -236,7 +236,8 @@ const Navbar = () => {
         <div className="md:hidden">
           <div className="space-y-1 px-2 pb-3">
             {/* Logo */}
-            <Link href="/" className="flex flex-shrink-0 items-center gap-2">
+            <Link href="/" className="flex flex-shrink-0 items-center gap-2"
+            onClick={handleMenuOpen}>
               <Image src={logo} alt="logo" className="h-6 w-auto" />
               <span className="text-white text-sm font-bold italic">
                 Kayrent
@@ -249,6 +250,7 @@ const Navbar = () => {
                   ? "underline underline-offset-4 bg-gray-900/50"
                   : ""
               } text-white block rounded-md px-3 py-2 text-base font-medium hover:bg-gray-900`}
+              onClick={handleMenuOpen}
             >
               Home
             </Link>
@@ -259,6 +261,7 @@ const Navbar = () => {
                   ? "underline underline-offset-4 bg-gray-900/50"
                   : ""
               } text-white block rounded-md px-3 py-2 text-base font-medium hover:bg-gray-900`}
+              onClick={handleMenuOpen}
             >
               Properties
             </Link>
@@ -271,6 +274,7 @@ const Navbar = () => {
                     ? "underline underline-offset-4 bg-gray-900/50"
                     : ""
                 } text-white block rounded-md px-3 py-2 text-base font-medium hover:bg-gray-900`}
+                onClick={handleMenuOpen}
               >
                 Add Property
               </Link>
